@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Homepage {% endblock %}
+
+{% block style %} 
+<link rel="stylesheet" type="text/css" href="/static/css/homepage.css">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+<div class="row col-xs-12">
+
+<div class="jumbotron">
+    <table>
+    <tbody>
+        <tr>
+            <td class="info align-middle">
+                <h1>Meal Builder</h1>
+                <p>Save time and energy by planning your meals!</p>  
+            </td>
+            <td class="info align-middle">
+
+                <div class="wrapper">
+                <form class="form-signin" action="/login" method="POST">
+                    <h2 class="form-signin-heading">Login Here</h2>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Email Address" required="" autofocus=""/><br>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Password" required=""/><br>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit" name="submit">Login</button>
+                </form>
+
+                <h4>Register as a new user</h4>
+                <p><a href="/register">Register Here!</a></p>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    </table>
+</div>
+
+
+
+</div>
+</div>
+
+{% endblock %}

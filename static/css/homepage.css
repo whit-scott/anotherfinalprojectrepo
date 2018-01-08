@@ -1,0 +1,35 @@
+/*CSS for landing page-homepage */
+
+body {
+  background-image: url(/static/img/fruits-and-vegetables.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  color: #000;
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*h1 {
+  color: white;
+}*/
+
+.jumbotron {
+  margin-top: 100px;
+  background-color: white;
+  /*opacity: 0.8;*/
+  color: #DFDCE3;
+}
+
+.info {
+  display:inline-block; 
+  text-align: center;
+  padding: 10px;
+}
+
+.wrapper {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
