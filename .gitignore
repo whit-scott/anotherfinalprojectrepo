@@ -6,3 +6,6 @@ data/ingredients3.txt
 tests.py
 random_notes.txt
 mealplan.sql
+.env
+staticfiles
+venv
