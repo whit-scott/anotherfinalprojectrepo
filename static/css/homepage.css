@@ -1,7 +1,5 @@
-/*CSS for landing page-homepage */
-
 body {
-  background-image: url(/static/img/fruits-and-vegetables.jpg);
+  background-image: url(/static/img/food.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
@@ -10,9 +8,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/*h1 {
-  color: white;
-}*/
 
 .jumbotron {
   margin-top: 100px;

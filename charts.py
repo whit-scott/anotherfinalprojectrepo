@@ -1,19 +1,15 @@
-""" Functions to help query db for analysis page."""
-
 from model import *
 from datetime import date
 import datetime
 
 
 def meal_week_data(user_id):
-    """Returns tuples of number of recipes based on past week."""
 
-    # User's list of week ids to look in
     weeks = User.query.get(user_id).weeks
     w_id_list = [w.week_id for w in weeks]
 
     today = date.today()
-    # date that was a week ago
+
     today_week = today + datetime.timedelta(days=-7)
 
     q = db.session.query(Meal.meal_type_id, Recipe.recipe_name).\
@@ -24,7 +20,6 @@ def meal_week_data(user_id):
 
 
 def prepare_meal_data(user_id, lookback_date):
-    """Returns tuples of recipes based on past month."""
 
     weeks = User.query.get(user_id).weeks
     w_id_list = [w.week_id for w in weeks]
@@ -68,9 +63,7 @@ def prepare_meal_data(user_id, lookback_date):
 # Helper functions
 
 def connect_to_db(app):
-    """Connect the database to our Flask app."""
 
-    # Configure to use our PstgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mealplan'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
@@ -78,8 +71,7 @@ def connect_to_db(app):
 
 
 if __name__ == "__main__":
-    # As a convenience, if we run this module interactively, it will leave
-    # you in a state of being able to work with the database directly.
+
 
     from server import app
     connect_to_db(app)

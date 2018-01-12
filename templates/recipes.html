@@ -12,14 +12,12 @@
 <div class="container">
 
 <div class="row col-xs-12">
-<h1>Recipe Box</h1><h4>Add, Edit, or Delete your recipes here.</h4>
+<h1>Recipes</h1><h4>Add, Edit, or Delete.</h4>
 </div>
 
 <div class="row">
     <div class="col-xs-6" id="meal-filter">
         <div>
-            <button type="button" id="recipes-btn-all"
-                class="btn btn-default btn-xs">All</button>
             <button type="button" id="recipes-btn-br"
                 class="btn btn-default btn-xs">Breakfast</button>
             <button type="button" id="recipes-btn-lu"
@@ -120,7 +118,6 @@
             for (var i = 0; i < data["num_ingredients"]; i++) {
                 var ing = ingredients["ing-"+i];
                 console.log(ing);
-                // console.log(data["ingredients"]["ing-"+i]["info"]);
 
                 var ingName = ing[0];
                 var ingAmount = ing[1];

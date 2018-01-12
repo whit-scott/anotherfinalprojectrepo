@@ -13,7 +13,7 @@
 <div class="container">
 
 <div class="row col-12">
-<p><h1 id="{{ week_id }}">Meal Plan</h1></p>
+<p><h1 id="{{ week_id }}">Meal Planner</h1></p>
 </div>
 
 <div class="row col-12">
@@ -304,25 +304,10 @@
 
   </table>
 </div>
-<!--     <button type="submit" name="edit" class="btn btn-default" id="meal-btn" value="Edit Meal Plan">
-        Edit Meal Plan
-    </button> -->
+
     <input type="submit" name="edit" id="meal-btn" class="btn btn-default"
     value="Edit Meal Plan">
 </form>
-
-<!-- <form action="/create-new-meal-plan" id="create-new-meal-plan">
-    <input type="submit" name="create-new" id="create-new-btn"
-        value="Create New Plan">
-</form> -->
-
-<!-- <form action="/shoppinglist">
-    <input type="hidden" name="week_id" value="{{ week_id }}">
-    <input type="submit" value="Shopping List" >
-    <button type="submit" class="btn btn-default">
-        <i class="glyphicon glyphicon-list"></i> Shopping List
-    </button>
-</form> -->
 
 </div>
 </div>
@@ -331,15 +316,12 @@
 
 <script>
 
-    // Setting up page when the page is loaded
     $(document).ready(function() {
         $('div.show-meal-plan').show();
         $('select.recipe-dropdown').hide();
     });
 
-    // Event handler when you click on the meal-plan page button
     $('#meal-plan-form').on("submit", addRecipeForm);
-    // $('#shopping-list-btn').on("click", goToShoppingList);
 
     function addRecipeForm(evt) {
         evt.preventDefault();
@@ -352,14 +334,13 @@
             $('#meal-btn').val("Save Meal Plan");
         }
         else {
-             // POST into DB
+
             $('select.recipe-dropdown').hide()
             $('div.show-meal-plan').show()
             $('#meal-btn').val("Edit Meal Plan");
 
             formData = getFormInfo();
-            // console.log("JSONstringify: " + JSON.stringify(formData));
-            // $.post("/edit-plan", JSON.stringify(formData), showMealPlan, "json");
+   
             $.ajax({
                 url:"/edit-plan",
                 type:"POST",
@@ -417,7 +398,7 @@
     }
 </script>
 
-<!-- Calendar Picker Widget -->
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css">

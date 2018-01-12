@@ -19,18 +19,14 @@ import datetime
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-# Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
 
-# Normally, if you use an undefined variable in Jinja2, it fails
-# silently. This is horrible. Fix this so that, instead, it raises an
-# error.
 app.jinja_env.undefined = StrictUndefined
 
 
 @app.route('/')
 def index():
-    """Mealplan App Homepage"""
+
     if 'user_name' in session:
         user_name = session['user_name']
         user = User.query.filter(User.user_name==user_name).one()
@@ -41,28 +37,25 @@ def index():
 
 @app.route('/register', methods=["GET"])
 def register_user():
-    """Handles registering user route."""
 
     return render_template("register-form.html")
 
 
 @app.route('/register', methods=["POST"])
 def register_complete():
-    """Completes the registration sign-up."""
+
     email = request.form.get("email")
     password = request.form.get("password")
 
+    #hashed_pw = "12345"
     hashed_pw = bcrypt.generate_password_hash(password)
 
     user_name = request.form.get("username")
 
-    # import pdb; pdb.set_trace()
-
-    # If user email does not currently exist in database:
     if not User.query.filter(User.email==email).all():
-        # If user name does not currently exist in database:
+
         if not User.query.filter(User.user_name==user_name).all():
-            # Create new user if email and username both do not exist
+
             new_user = User(email=email, password=hashed_pw, user_name=user_name)
 
             db.session.add(new_user)
@@ -79,20 +72,17 @@ def register_complete():
 
 @app.route('/login', methods=["POST"])
 def login():
-    """Handles Login route, checks username/password, directs to user page."""
+    
 
     email = request.form.get("email")
     password = request.form.get("password")
 
-    # If the user email is not in the database
     if not User.query.filter(User.email==email).all():
         flash("User does not exist")
         return redirect("/")
     else:
         user = User.query.filter(User.email==email).one()
-        # if bcrypt.checkpw(password.encode('utf8'), user.password):
         if bcrypt.check_password_hash(user.password, password):
-            # password==user.password:
             session['user_name'] = user.user_name
             flash("You are logged in")
             return redirect("/user/" + user.user_name)
@@ -103,7 +93,6 @@ def login():
 
 @app.route('/logout')
 def logout():
-    """Logs out user."""
     flash("You are logged out.")
     del session["user_name"]
 
@@ -112,7 +101,6 @@ def logout():
 
 @app.route('/user/<user_name>')
 def user_info(user_name):
-    """Users main page when logged in."""
 
     user = User.query.filter(User.user_name==user_name).one()
 
@@ -121,35 +109,27 @@ def user_info(user_name):
 
 @app.route('/mealplan')
 def show_meal_plan(start_date=this_week_start_date()):
-    """Shows user's mealplan page."""
 
-    # Checking if user is logged in
     if 'user_name' in session:
         user = User.query.filter(User.user_name==session['user_name']).one()
         all_recipes = user.recipes
 
-        # Grabbing all the week objects that belong to a user
         weeks = user.weeks
         week_list = [(w.start_date, w.week_id) for w in weeks]
 
-        #if there are no weeks created, i.e. it is a new user
-        #create week for current week
         if len(week_list) == 0:
             create_new_week(user, start_date)
             flash("Please fill in your meals.")
 
-        # mealplan displays most current week if there is a mealplan created
-        # page shows the last created mealplan
         if get_week_id(user.user_id, start_date) == False:
             flash("You do not have a meal plan for this week.")
-            # sets week ID to the most recent week that was created
+
             week_id = Week.query.filter(Week.user_id==user.user_id).order_by(
                 Week.start_date.desc()).all()[0].week_id
         else:
-            # week-id is the current week's start_date
+
             week_id = get_week_id(user.user_id, start_date)
 
-        # Grabbing the list of all the days that belong to the week_id
         w = Week.query.get(week_id)
         all_days = w.plan_days()
 
@@ -167,7 +147,7 @@ def show_meal_plan(start_date=this_week_start_date()):
 
 @app.route('/meal-plan-week')
 def show_meal_plan_week_id():
-    """Given a week_id, show the meal plan for that week."""
+
     if 'user_name' in session:
 
         week_id = request.args.get("select-week-id")
@@ -181,7 +161,7 @@ def show_meal_plan_week_id():
 
 @app.route('/edit-plan', methods=["POST"])
 def edit_meal_plan():
-    """Edits Meal plan, modifies DB with new meals, returns user to mealpage."""
+
     if 'user_name' in session:
 
         user = User.query.filter(User.user_name==session['user_name']).one()
@@ -195,9 +175,7 @@ def edit_meal_plan():
         while i <= 7:
             day = request.json["day"+str(i)]
             meal_date = all_days[i-1]
-            # print "meal_date", meal_date
 
-            # import pdb; pdb.set_trace()
             if day["breakfast"] != []:
                 edit_meals("br", day["breakfast"], week_id, meal_date)
             if day["lunch"] != []:
@@ -220,29 +198,27 @@ def edit_meal_plan():
 
 @app.route('/create-new-meal-plan')
 def create_new_meal_plan_pick_week():
-    """Goes to calendar to pick a week."""
+
     return render_template("/pick-calendar-week.html")
 
 
 @app.route('/create-new-meal-plan', methods=["POST"])
 def create_new_meal_plan():
-    """Checks if week already exists, if not, creates it."""
+
     if 'user_name' in session:
         user_name = session['user_name']
         user = User.query.filter(User.user_name==user_name).one()
 
         date_string = request.form.get("picked-week")
         start_date_string = date_string[:10]
-        # print "start_date_string: ", start_date_string
-        start_date = datetime.datetime.strptime(start_date_string, "%m/%d/%Y").date()
-        # print "date object: ", start_date
 
-        # If the week already exists
+        start_date = datetime.datetime.strptime(start_date_string, "%m/%d/%Y").date()
+
         if Week.query.filter(Week.user_id==user.user_id,
                              Week.start_date==start_date).all() != []:
-            # flash("Week already exists.")
+
             return show_meal_plan(start_date)
-        # Week does not exist, need to create it
+
         else:
             create_new_week(user, start_date)
             flash("Please fill in your meals.")
@@ -254,8 +230,7 @@ def create_new_meal_plan():
 
 @app.route('/recipes')
 def show_recipes():
-    """Shows list of all user's recipes."""
-    # Checking if user is logged in
+
     if 'user_name' in session:
         user_name = session['user_name']
         user = User.query.filter(User.user_name==user_name).one()
@@ -301,27 +276,26 @@ def show_recipe_info():
 
 @app.route('/show-filter-recipes.json', methods=["GET"])
 def filter_recipes():
-    """Returns a list of recipes from filter."""
+
     meal_type = request.args.get("meal_type")
-    # print "meal_type: ", meal_type
+
     meal_list = Meal.query.filter(Meal.meal_type_id==meal_type).all()
 
     recipe_list = []
     for m in meal_list:
-        # print m.recipes
+
         if m.recipes != None:
             recipe_list = recipe_list + m.recipes
 
     recipe_list = list(set(recipe_list))
     recipes = [{'id':rec.recipe_id, 'name':rec.recipe_name,'directions':rec.directions} for rec in recipe_list]
 
-    # print recipes
     return jsonify(recipes)
 
 
 @app.route('/edit-recipe', methods=["GET"])
 def show_edit_recipe_page():
-    """Directs user to edit recipe page with pre-filled info to edit."""
+
     recipe_id = request.args.get("recipe-id")
     r = Recipe.query.get(recipe_id)
     units = Unit.query.all()
@@ -330,39 +304,33 @@ def show_edit_recipe_page():
 
 @app.route('/edit-recipe', methods=["POST"])
 def edit_recipe():
-    """Takes changes from user and edits recipe info."""
 
     if 'user_name' in session:
         user_name = session['user_name']
         user = User.query.filter(User.user_name==user_name).one()
 
-        # import pdb; pdb.set_trace()
         recipe_id = request.json["recipe_id"]
         recipe_name = request.json["name"]
         directions = request.json["directions"]
         ing_dict = request.json["ingredients"]
         new_ing = request.json["new_ingredients"]
 
-        # import pdb; pdb.set_trace()
-
-        # Adding new ingredients to the database
         for item in new_ing.keys():
             ing_name, amount, unit = new_ing[item]
 
             ing_query = Ingredient.query.filter(
                 Ingredient.ingredient_name==str(ing_name))
-            # if ingredient already exists in db:
+
             if ing_query.all():
                 ing = ing_query.one()
                 add_ingredient_to_recipe(ing.ingredient_id, recipe_id,
                     str(unit), float(amount))
-            # ingredient does not exist in db
+
             else:
                 ing_id = add_ingredient(str(ing_name))
                 add_ingredient_to_recipe(ing_id, recipe_id,
                     str(unit), float(amount))
 
-        # Editing existing ingredients to database
         for item in ing_dict:
             ing_id, ing_name, amount, unit = ing_dict[item]
             edit_recipe_ingredient(recipe_id, ing_id, unit, amount)
@@ -377,7 +345,7 @@ def edit_recipe():
 
 @app.route('/delete-recipe', methods=["POST"])
 def delete_recipe():
-    """Removes recipe from user."""
+
     if 'user_name' in session:
         user_name = session['user_name']
         user = User.query.filter(User.user_name == user_name).one()
@@ -412,40 +380,28 @@ def add_recipe():
         user_name = session['user_name']
         user = User.query.filter(User.user_name==user_name).one()
 
-        # import pdb; pdb.set_trace()
-
         recipe_name = request.json["name"]
         directions = request.json["directions"]
         ingredient_dict = request.json["ingredients"]
 
-        # import pdb; pdb.set_trace()
-        # print recipe_name, directions, ingredient_dict
-
-        # Adding recipe to database
-        # Future: add in booleans
         recipe_id = add_new_recipe(recipe_name=recipe_name,
                                 directions=directions)
 
-        # connect the user to recipe
         add_recipe_to_user(recipe_id, user.user_id)
 
-        # Adding the ingredients to the database
         for item in ingredient_dict.keys():
             ing_name, amount, unit = ingredient_dict[item]
 
             ing_query = Ingredient.query.filter(
                 Ingredient.ingredient_name==str(ing_name))
-            # if ingredient already exists in db:
             if ing_query.all():
                 ing = ing_query.one()
                 add_ingredient_to_recipe(ing.ingredient_id, recipe_id,
                     str(unit), float(amount))
-            # ingredient does not exist in db
             else:
                 ing_id = add_ingredient(str(ing_name))
                 add_ingredient_to_recipe(ing_id, recipe_id,
                     str(unit), float(amount))
-        # print "finished adding ingredients"
         return jsonify("/recipes")
 
     else:
@@ -455,7 +411,6 @@ def add_recipe():
 
 @app.route('/shoppinglist')
 def show_shopping_list():
-    """shows users shopping list."""
     if 'user_name' in session:
         user_name = session['user_name']
         user = User.query.filter(User.user_name==user_name).one()
@@ -481,7 +436,7 @@ def show_shopping_list():
 
 @app.route('/analysis')
 def show_analytics():
-    """Shows analytics page."""
+
     return render_template("analysis.html")
 
 
@@ -517,15 +472,11 @@ def ingredient_data():
 
 
 if __name__ == "__main__":
-    # We have to set debug=True here, since it has to be True at the
-    # point that we invoke the DebugToolbarExtension
-    app.debug = False
-    app.jinja_env.auto_reload = app.debug  # make sure templates, etc. are not cached in debug mode
+
+    app.debug = True
+    app.jinja_env.auto_reload = app.debug  
 
     connect_to_db(app)
 
-    # Use the DebugToolbar
-    # DebugToolbarExtension(app)
-
-
-    app.run(port=5000, host='0.0.0.0')
+    #app.run(port=5000, host='0.0.0.0', threaded=True, processes=4)
+    app.run(port=5000, host='0.0.0.0', threaded=True)
