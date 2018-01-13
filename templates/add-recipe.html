@@ -60,14 +60,14 @@
     function addIngredientField(evt) {
         evt.preventDefault();
 
-        var max_fields = 20; //maximum ingredients allowed
-        var wrapper = $(".ingredient-additions"); //Fields wrapper
+        var max_fields = 20; 
+        var wrapper = $(".ingredient-additions"); 
         var x = $("select.ingredient").length;
 
-        if(x < max_fields) { //max input box allowed
-            x++; //text box increment
+        if(x < max_fields) { 
+            x++; 
 
-            // adding one row of ingredient input fields
+            
             $(wrapper).append('<tr><td><input type="number" name="amount"' +
                 'id="amount-' + x + '" min="0"></td>' +
                 ' <td><select name="ingredient" class="ingredient"' +
@@ -82,7 +82,7 @@
         }
     }
     
-    $(wrapper).on("click",".remove_field", function(evt ) { //user click on remove text
+    $(wrapper).on("click",".remove_field", function(evt ) { 
         evt.preventDefault(); $(this).parent('div').remove(); x--;
     })
 
@@ -95,16 +95,12 @@
     function addRecipe(evt) {
         evt.preventDefault();
 
-        // console.log("Got into addRecipe");
         var recipeObject = new Object();
         var recipeName = $("#edit-name").val();
         var directions = $("#edit-directions").val();
 
-        // console.log(recipeName);
-        // console.log(directions);
-
         var num_ing = $("select.ingredient").length;
-        // var ingredient_list = [];
+
         var ingredientObject = new Object();
 
         for (var i = 1; i <= num_ing; i++) {
@@ -114,7 +110,6 @@
 
             ingredient = [ingredientName, ingredientAmount, ingredientUnit];
 
-            // ingredient_list.push(ingredient);
             ingredientObject[i] = ingredient;
         }
 
@@ -122,11 +117,7 @@
         recipeObject["name" ] = recipeName;
         recipeObject["directions"] = directions;
 
-        // console.log(recipeObject);
-
-        // $.post("/add-recipe", recipeObject, function (data) {
-        //     window.location.replace("/recipes");
-        // });
+       
 
         $.ajax({
             url:"/add-recipe",
@@ -135,7 +126,6 @@
             contentType:"application/json; charset=utf-8",
             dataType:"json",
             success: function(data) {
-                // console.log(data);
                 console.log("success?");
                 window.location.replace("/recipes");
             }

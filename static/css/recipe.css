@@ -1,5 +1,3 @@
-/*CSS for Recipe page */
-
 #meal-filter,  #recipe-info {
     display: inline-block;
 }
@@ -19,7 +17,7 @@ tbody {
 }
 
 h1 {
-    color: #FC4A1A;
+    color: darkblue;
 }
 
 .panel {

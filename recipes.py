@@ -1,13 +1,10 @@
-""" Helper functions for recipe page."""
-
 from model import *
 from datetime import date
 import datetime
 
 def get_ingredients_list(recipe_id):
-    """Returns list of tuples of ingredient information given a recipe_id."""
 
-    # Perhaps refactor later and create an extensive SQLAlchemy query
+  
     recipe = Recipe.query.get(recipe_id)
 
     recipe_ingredients_list = recipe.recipe_ingredients
@@ -29,7 +26,6 @@ def get_ingredients_list(recipe_id):
 
 
 def get_all_recipes_from_week(week_id):
-    """Returns a list of all recipes (undeduplicated) given a week_id."""
     week = Week.query.get(week_id)
 
     meals = week.meals
@@ -42,17 +38,14 @@ def get_all_recipes_from_week(week_id):
 
 
 def get_shopping_list(recipe_list):
-    """Returns shopping list info for given recipe object list."""
 
     shopping_list = {}
 
     for recipe in recipe_list:
-        # print recipe
         ingredient_info = get_ingredients_list(recipe.recipe_id)
 
         for ing_id, ing_name, cat_name, amount, unit, url in ingredient_info:
 
-            # if category already exists or ingredient already in category list
             category_list = cat_name.split(";")
             category_name = category_list[0]
             other_categories = category_list[1:]
@@ -77,23 +70,19 @@ def get_shopping_list(recipe_list):
                 category_obj = {ing_id: ing_obj}
                 shopping_list[category_name] = category_obj
 
-    # print shopping_list
     return shopping_list
 
 
 def add_ingredient_to_recipe(ingredient_id, recipe_id, unit_id, amount):
-    """Connects an ingredient to a recipe in RecipeIngredient table."""
     recipe_ing = RecipeIngredient(recipe_id=recipe_id,
                                 ingredient_id=ingredient_id,
                                 unit_id=unit_id,
                                 amt=amount)
     db.session.add(recipe_ing)
     db.session.commit()
-    # return recipe_ing.recipe_ing_id
 
 
 def add_ingredient(ingredient_name, ingredient_url=None):
-    """Adds an ingredient to the ingredient table and returns the ing_id"""
 
     c_id = Category.query.filter(Category.category_name=="Unknown").one().category_id
     new_ing = Ingredient(ingredient_name=ingredient_name,
@@ -106,7 +95,6 @@ def add_ingredient(ingredient_name, ingredient_url=None):
 
 def add_new_recipe(recipe_name, directions=None, recipe_url=None,
     has_dairy=None, has_gluten=None, vegetarian=None):
-    """Creates a new recipe and returns the recipe_id."""
     new_rec = Recipe(recipe_name=recipe_name,
                     directions=directions,
                     recipe_url=recipe_url,
@@ -119,21 +107,18 @@ def add_new_recipe(recipe_name, directions=None, recipe_url=None,
 
 
 def add_recipe_to_user(recipe_id, user_id):
-    """Connects a recipe to a user's recipebox."""
     user_rec = UserRecipe(user_id=user_id, recipe_id=recipe_id)
     db.session.add(user_rec)
     db.session.commit()
 
 
 def remove_recipe_from_user(recipe_id, user_id):
-    """Removes the connection between a recipe and a user."""
     ur = UserRecipe.query.filter(UserRecipe.recipe_id==recipe_id,
                                 UserRecipe.user_id==user_id).one()
     db.session.delete(ur)
     db.session.commit()
 
 def remove_recipe_from_meal(recipe_id):
-    """Removies all the meals that a recipe is connected to."""
     mr_list = MealRecipe.query.filter(MealRecipe.recipe_id==recipe_id).all()
 
     for mr in mr_list:
@@ -143,7 +128,6 @@ def remove_recipe_from_meal(recipe_id):
 
 
 def remove_ingredients_from_recipe(recipe_id):
-    """Removes the connection of a recipe to all its ingredients."""
     rec_ing_list = RecipeIngredient.query.filter(
                     RecipeIngredient.recipe_id==recipe_id).all()
 
@@ -154,7 +138,6 @@ def remove_ingredients_from_recipe(recipe_id):
 
 
 def remove_recipe(recipe_id):
-    """Deletes recipe from DB."""
 
     recipe = Recipe.query.get(recipe_id)
     db.session.delete(recipe)
@@ -162,7 +145,6 @@ def remove_recipe(recipe_id):
 
 
 def ingredient_in_recipe(ingredient_id, recipe_id):
-    """Checks to see if ingredient already in the recipe. Returns boolean."""
 
     check = RecipeIngredient.query.filter(RecipeIngredient.recipe_id==recipe_id,
                         RecipeIngredient.ingredient_id==ingredient_id).first()
@@ -170,7 +152,6 @@ def ingredient_in_recipe(ingredient_id, recipe_id):
 
 
 def edit_recipe_ingredient(recipe_id, ingredient_id, unit, amount):
-    """Edits ingredient info for a specfic recipe."""
     data = {    "unit_id": unit,
                 "amt": amount
             }
@@ -195,9 +176,7 @@ def edit_recipe_information(recipe_id, recipe_name, directions=None,
 # Helper functions
 
 def connect_to_db(app):
-    """Connect the database to our Flask app."""
 
-    # Configure to use our PstgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mealplan'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
@@ -205,8 +184,7 @@ def connect_to_db(app):
 
 
 if __name__ == "__main__":
-    # As a convenience, if we run this module interactively, it will leave
-    # you in a state of being able to work with the database directly.
+  
 
     from server import app
     connect_to_db(app)
